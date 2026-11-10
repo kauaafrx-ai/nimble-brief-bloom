@@ -38,6 +38,10 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
   --color-background: var(--background);
+  --color-gold: var(--gold);
+  --color-terracotta: var(--terracotta);
+  --font-display: "Cormorant Garamond", serif;
+  --font-sans: "Jost", sans-serif;
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -73,24 +77,28 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
+  --radius: 1rem;
+  --font-display: "Cormorant Garamond", serif;
+  --gold: oklch(0.78 0.11 80);
+  --terracotta: oklch(0.6 0.13 45);
+  --gradient-cta: linear-gradient(135deg, var(--terracotta), var(--gold));
+  --background: oklch(0.97 0.015 80);
+  --foreground: oklch(0.3 0.04 50);
+  --card: oklch(0.99 0.008 80);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
+  --primary: oklch(0.35 0.05 50);
   --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
+  --secondary: oklch(0.92 0.03 70);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
+  --muted-foreground: oklch(0.5 0.04 55);
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
+  --border: oklch(0.88 0.03 70);
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.704 0.04 256.788);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -153,3 +161,14 @@
     color: var(--color-foreground);
   }
 }
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes pulse-cta { 0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--terracotta) 50%,transparent)} 50%{box-shadow:0 0 0 14px transparent} }
+@keyframes marquee { to { transform: translateX(-50%) } }
+@keyframes spin-slow { to { transform: rotate(360deg) } }
+@utility cta { background: var(--gradient-cta); color: var(--primary-foreground); animation: pulse-cta 2.2s infinite; }
+@utility float { animation: float 5s ease-in-out infinite; }
+@utility marquee { animation: marquee 22s linear infinite; }
+@utility spin-slow { animation: spin-slow 18s linear infinite; }
+.reveal{opacity:0;transform:translateY(24px);transition:all .8s ease}
+.reveal.in{opacity:1;transform:none}
