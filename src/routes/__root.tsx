@@ -8,7 +8,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -105,6 +105,79 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+function MetaPixelConsent() {
+  const [choice, setChoice] = useState<"accepted" | "rejected" | null>(null);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("meta-pixel-consent");
+    if (saved === "accepted" || saved === "rejected") setChoice(saved);
+  }, []);
+
+  useEffect(() => {
+    if (choice !== "accepted") return;
+
+    const w = window as any;
+    if (w.fbq) return;
+
+    const n: any = function (...args: any[]) {
+      if (n.callMethod) n.callMethod.apply(n, args);
+      else n.queue.push(args);
+    };
+    n.queue = [];
+    n.push = n;
+    n.loaded = true;
+    n.version = "2.0";
+    w.fbq = n;
+    w._fbq = n;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://connect.facebook.net/en_US/fbevents.js";
+    document.head.appendChild(script);
+
+    n("init", "2051741952176394");
+    n("track", "PageView");
+  }, [choice]);
+
+  if (choice !== null) return null;
+
+  const choose = (value: "accepted" | "rejected") => {
+    window.localStorage.setItem("meta-pixel-consent", value);
+    setChoice(value);
+  };
+
+  return (
+    <aside
+      role="dialog"
+      aria-label="Preferências de cookies"
+      className="fixed inset-x-0 bottom-0 z-[100] border-t border-border bg-background p-4 shadow-lg"
+    >
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-foreground">
+          Utilizamos cookies de publicidade da Meta para medir resultados e melhorar anúncios.
+          Você pode aceitar ou recusar esse rastreamento.
+        </p>
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={() => choose("rejected")}
+            className="rounded-md border border-input px-4 py-2 text-sm font-medium text-foreground"
+          >
+            Recusar
+          </button>
+          <button
+            type="button"
+            onClick={() => choose("accepted")}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Aceitar
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -113,6 +186,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <MetaPixelConsent />
         <Scripts />
       </body>
     </html>
